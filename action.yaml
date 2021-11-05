@@ -1,0 +1,41 @@
+name: "Publish Helm Chart"
+description: "Publishes a Helm chart for a Smile app."
+inputs:
+  docker_tag:
+    description: "The docker tag that should be used for the new helm chart."
+    required: true
+  helm_chart_path:
+    description: "Relative path from the root of the current repo to the helm chart files."
+    required: true
+outputs:
+  helm_chart_version:
+    description: "Version of the new helm chart."
+    value: ${{ steps.chart_version.outputs.new_chart_version }}
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Generate new helm chart version
+      id: chart_version
+      shell: bash
+      run: echo "::set-output name=new_chart_version::$(yq e '.version' '${{ inputs.helm_chart_path}}/Chart.yaml')-b${{ github.run_id }}"
+    - name: Get chart name
+      shell: bash
+      id: chart_name
+      run: echo "::set-output name=chart_name::$(yq e '.name' '${{ inputs.helm_chart_path}}/Chart.yaml')"
+    - name: Update helm dependencies
+      shell: bash
+      run: |
+        helm repo update
+        helm dependency update ./helm/smile-search-umbrella
+    - name: Set image version
+      shell: bash
+      run: |
+        yq e -i ".image.tag=\"${{ inputs.docker_tag }}\"" "${{ inputs.helm_chart_path }}/values.yaml"
+    - name: Package helm chart
+      shell: bash
+      run: helm package ./${{ inputs.helm_chart_path }} --app-version ${{ github.sha }} --version ${{ steps.chart_version.outputs.new_chart_version }}
+    - name: Push helm chart to repo
+      shell: bash
+      run: helm cm-push "${{ steps.chart_name.outputs.chart_name }}-${{steps.chart_version.outputs.new_chart_version}}.tgz" "smile"
