@@ -28,7 +28,7 @@ runs:
       shell: bash
       run: |
         helm repo update
-        helm dependency update ./helm/smile-search-umbrella
+        helm dependency update ./${{ inputs.helm_chart_path }}
     - name: Set image version
       shell: bash
       run: |
