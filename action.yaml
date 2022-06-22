@@ -41,4 +41,6 @@ runs:
       run: helm package ./${{ inputs.helm_chart_path }} --app-version ${{ github.sha }} --version ${{ steps.chart_version.outputs.new_chart_version }}
     - name: Push helm chart to repo
       shell: bash
-      run: helm push "${{ steps.chart_name.outputs.chart_name }}-${{steps.chart_version.outputs.new_chart_version}}.tgz" ${{ inputs.oci_repo }}
+      run: |
+        export HELM_EXPERIMENTAL_OCI=1
+        helm push "${{ steps.chart_name.outputs.chart_name }}-${{steps.chart_version.outputs.new_chart_version}}.tgz" ${{ inputs.oci_repo }}
