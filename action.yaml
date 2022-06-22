@@ -7,6 +7,9 @@ inputs:
   helm_chart_path:
     description: "Relative path from the root of the current repo to the helm chart files."
     required: true
+  oci_repo:
+    description: "OCI repo (ECR repo)"
+    required: true
 outputs:
   helm_chart_version:
     description: "Version of the new helm chart."
@@ -38,4 +41,4 @@ runs:
       run: helm package ./${{ inputs.helm_chart_path }} --app-version ${{ github.sha }} --version ${{ steps.chart_version.outputs.new_chart_version }}
     - name: Push helm chart to repo
       shell: bash
-      run: helm cm-push "${{ steps.chart_name.outputs.chart_name }}-${{steps.chart_version.outputs.new_chart_version}}.tgz" "smile"
+      run: helm push "${{ steps.chart_name.outputs.chart_name }}-${{steps.chart_version.outputs.new_chart_version}}.tgz" ${{ inputs.oci_repo }}
