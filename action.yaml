@@ -9,7 +9,7 @@ inputs:
     required: true
   oci_repo:
     description: "OCI repo (ECR repo)"
-    required: true
+    required: false
 outputs:
   helm_chart_version:
     description: "Version of the new helm chart."
