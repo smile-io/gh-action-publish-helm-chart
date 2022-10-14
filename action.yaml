@@ -10,6 +10,7 @@ inputs:
   oci_repo:
     description: "OCI repo (ECR repo)"
     required: true
+    default: "877068819435.dkr.ecr.us-east-1.amazonaws.com"
 outputs:
   helm_chart_version:
     description: "Version of the new helm chart."
