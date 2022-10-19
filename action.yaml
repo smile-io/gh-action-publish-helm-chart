@@ -44,4 +44,5 @@ runs:
       shell: bash
       run: |
         export HELM_EXPERIMENTAL_OCI=1
-        helm push "${{ steps.chart_name.outputs.chart_name }}-${{steps.chart_version.outputs.new_chart_version}}.tgz" "oci://${{ inputs.oci_repo }}"
+        aws ecr get-login-password --region us-east-1 | helm registry login --username AWS --password-stdin 877068819435.dkr.ecr.us-east-1.amazonaws.com
+        helm --debug push "${{ steps.chart_name.outputs.chart_name }}-${{steps.chart_version.outputs.new_chart_version}}.tgz" "oci://${{ inputs.oci_repo }}"
