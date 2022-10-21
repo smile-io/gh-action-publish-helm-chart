@@ -31,6 +31,8 @@ runs:
     - name: Update helm dependencies
       shell: bash
       run: |
+        export HELM_EXPERIMENTAL_OCI=1
+        aws ecr get-login-password --region us-east-1 | helm registry login --username AWS --password-stdin 877068819435.dkr.ecr.us-east-1.amazonaws.com
         helm repo update
         helm dependency update ./${{ inputs.helm_chart_path }}
     - name: Set image version
