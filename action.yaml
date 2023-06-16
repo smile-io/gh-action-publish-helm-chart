@@ -23,11 +23,11 @@ runs:
     - name: Generate new helm chart version
       id: chart_version
       shell: bash
-      run: echo "::set-output name=new_chart_version::$(yq e '.version' '${{ inputs.helm_chart_path}}/Chart.yaml')-b${{ github.run_id }}"
+      run: echo "new_chart_version=$(yq e '.version' '${{ inputs.helm_chart_path}}/Chart.yaml')-b${{ github.run_id }}" >> $GITHUB_OUTPUT
     - name: Get chart name
       shell: bash
       id: chart_name
-      run: echo "::set-output name=chart_name::$(yq e '.name' '${{ inputs.helm_chart_path}}/Chart.yaml')"
+      run: echo "chart_name=$(yq e '.name' '${{ inputs.helm_chart_path}}/Chart.yaml')" >> $GITHUB_OUTPUT
     - name: Update helm dependencies
       shell: bash
       run: |
