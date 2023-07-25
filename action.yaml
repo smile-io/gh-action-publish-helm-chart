@@ -43,22 +43,22 @@ runs:
         cat $GITHUB_OUTPUT
     - name: Update helm dependencies
       shell: bash
-      if: steps.helm_chart_validation.outputs.helm_chart_exist == "false"
+      if: steps.helm_chart_validation.outputs.helm_chart_exist == false
       run: |
         export HELM_EXPERIMENTAL_OCI=1
         aws ecr get-login-password --region us-east-1 | helm registry login --username AWS --password-stdin 877068819435.dkr.ecr.us-east-1.amazonaws.com
         helm dependency update ./${{ inputs.helm_chart_path }}
     - name: Set image version
       shell: bash
-      if: steps.helm_chart_validation.outputs.helm_chart_exist == "false"
+      if: steps.helm_chart_validation.outputs.helm_chart_exist == false
       run: |
         yq e -i ".image.tag=\"${{ inputs.docker_tag }}\"" "${{ inputs.helm_chart_path }}/values.yaml"
     - name: Package helm chart
-      if: steps.helm_chart_validation.outputs.helm_chart_exist == "false"
+      if: steps.helm_chart_validation.outputs.helm_chart_exist == false
       shell: bash
       run: helm package ./${{ inputs.helm_chart_path }} --app-version ${{ github.sha }} --version ${{ steps.chart_version.outputs.new_chart_version }}
     - name: Push helm chart to repo
-      if: steps.helm_chart_validation.outputs.helm_chart_exist == "false"
+      if: steps.helm_chart_validation.outputs.helm_chart_exist == false
       shell: bash
       run: |
         export HELM_EXPERIMENTAL_OCI=1
