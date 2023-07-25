@@ -28,20 +28,33 @@ runs:
       shell: bash
       id: chart_name
       run: echo "chart_name=$(yq e '.name' '${{ inputs.helm_chart_path}}/Chart.yaml')" >> $GITHUB_OUTPUT
+    - name: Validate if Image Exist
+      id: helm_chart_validation
+      run: | 
+        aws ecr describe-images --repository-name ${{ steps.chart_name.outputs.chart_name }} --image-ids imageTag=${{steps.chart_version.outputs.new_chart_version}} --output json --no-cli-pager > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            echo "helm_chart_exist=true" >> $GITHUB_OUTPUT
+        else
+            echo "helm_chart_exist=false" >> $GITHUB_OUTPUT
+        fi
     - name: Update helm dependencies
       shell: bash
+      if: steps.helm_chart_validation.outputs.helm_chart_exist == false
       run: |
         export HELM_EXPERIMENTAL_OCI=1
         aws ecr get-login-password --region us-east-1 | helm registry login --username AWS --password-stdin 877068819435.dkr.ecr.us-east-1.amazonaws.com
         helm dependency update ./${{ inputs.helm_chart_path }}
     - name: Set image version
       shell: bash
+      if: steps.helm_chart_validation.outputs.helm_chart_exist == false
       run: |
         yq e -i ".image.tag=\"${{ inputs.docker_tag }}\"" "${{ inputs.helm_chart_path }}/values.yaml"
     - name: Package helm chart
+      if: steps.helm_chart_validation.outputs.helm_chart_exist == false
       shell: bash
       run: helm package ./${{ inputs.helm_chart_path }} --app-version ${{ github.sha }} --version ${{ steps.chart_version.outputs.new_chart_version }}
     - name: Push helm chart to repo
+      if: steps.helm_chart_validation.outputs.helm_chart_exist == false
       shell: bash
       run: |
         export HELM_EXPERIMENTAL_OCI=1
