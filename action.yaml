@@ -33,9 +33,7 @@ runs:
       shell: bash
       continue-on-error: true
       run: |
-        set +e
         echo "helm_chart_exist=false" >> $GITHUB_OUTPUT
-        cat $GITHUB_OUTPUT
         helm pull "oci://${{ inputs.oci_repo }}/${{ steps.chart_name.outputs.chart_name }}" --version "${{steps.chart_version.outputs.new_chart_version}}" > /dev/null 2>&1 &&
         if [[ "$?" -eq 0 ]]; then
             echo "helm_chart_exist=true" >> $GITHUB_OUTPUT
