@@ -30,6 +30,7 @@ runs:
       run: echo "chart_name=$(yq e '.name' '${{ inputs.helm_chart_path}}/Chart.yaml')" >> $GITHUB_OUTPUT
     - name: Validate if Image Exist
       id: helm_chart_validation
+      shell: bash
       run: | 
         aws ecr describe-images --repository-name ${{ steps.chart_name.outputs.chart_name }} --image-ids imageTag=${{steps.chart_version.outputs.new_chart_version}} --output json --no-cli-pager > /dev/null 2>&1
         if [ $? -eq 0 ]; then
