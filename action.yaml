@@ -52,6 +52,7 @@ runs:
       shell: bash
       if: steps.helm_chart_validation.outputs.helm_chart_exist == false
       run: |
+        echo ${{ steps.helm_chart_validation.outputs.helm_chart_exist }}
         yq e -i ".image.tag=\"${{ inputs.docker_tag }}\"" "${{ inputs.helm_chart_path }}/values.yaml"
     - name: Package helm chart
       if: steps.helm_chart_validation.outputs.helm_chart_exist == false
