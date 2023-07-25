@@ -43,6 +43,7 @@ runs:
     - name: Update helm dependencies
       shell: bash
       run: |
+        echo ${{ steps.helm_chart_validation.outputs.helm_chart_exist }}
         export HELM_EXPERIMENTAL_OCI=1
         aws ecr get-login-password --region us-east-1 | helm registry login --username AWS --password-stdin 877068819435.dkr.ecr.us-east-1.amazonaws.com
         helm dependency update ./${{ inputs.helm_chart_path }}
