@@ -40,6 +40,7 @@ runs:
         else
             echo "helm_chart_exist=false" >> $GITHUB_OUTPUT
         fi
+        echo $GITHUB_OUTPUT
     - name: Update helm dependencies
       shell: bash
       if: steps.helm_chart_validation.outputs.helm_chart_exist == false
